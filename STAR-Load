@@ -30,8 +30,8 @@ while [[ $# -gt 0 ]]; do
   key=${1}
   case ${key} in
     --genomeDir)
-      real_genome_dir=`awesome_readlink ${2}`
-      ARGS="${ARGS} --genomeDir ${real_genome_dir}"
+      real_genome_file=`awesome_readlink ${2}/Genome`
+      ARGS="${ARGS} --genomeDir `dirname ${real_genome_file}`"
       shift
       ;;
     *)
@@ -41,5 +41,7 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
+echo "==> STAR-Load Arguments: ${ARGS}"
+
 # Execute STAR
-STAR "${ARGS}"
+STAR ${ARGS}
