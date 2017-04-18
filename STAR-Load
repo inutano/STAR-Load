@@ -1,0 +1,45 @@
+#!/bin/bash
+# A script for STAR to execute via cwltool with option genomeLoad=LoadandKeep
+
+# Check STAR
+fi [[ -z `which STAR 2>/dev/null` ]]; then
+  echo "You need to install STAR to enaable local STAR execution."
+  exit 1
+fi
+
+# Check readlink
+if [[ -z `which readlink 2>/dev/null` ]]; then
+  echo "You need to install readlink to enable local STAR execution."
+  exit 1
+fi
+
+# For non-GNU readlink e.g. on OS X
+awesome_readlink() {
+  target="${1}"
+  while [[ "${target}" != "" ]]; do
+    cd `dirname ${target}`
+    fname=`basename ${target}`
+    target=`readlink ${fname}`
+  done
+  echo `pwd -P`/$fname
+}
+
+# Parse command line arguments
+
+while [[ $# -gt 0 ]]; do
+  key=${1}
+  case ${key} in
+    --genomeDir)
+      real_genome_dir=`awesome_readlink ${2}`
+      ARGS="${ARGS} --genomeDir ${real_genome_dir}"
+      shift
+      ;;
+    *)
+      ARGS="${ARGS} ${key}"
+      ;;
+  esac
+  shift
+done
+
+# Execute STAR
+STAR "${ARGS}"
