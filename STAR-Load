@@ -2,7 +2,7 @@
 # A script for STAR to execute via cwltool with option genomeLoad=LoadandKeep
 
 # Check STAR
-fi [[ ! -e `which STAR 2>/dev/null` ]]; then
+if [[ ! -e `which STAR 2>/dev/null` ]]; then
   echo "You need to install STAR to enaable local STAR execution."
   exit 1
 fi
