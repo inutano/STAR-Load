@@ -2,13 +2,13 @@
 # A script for STAR to execute via cwltool with option genomeLoad=LoadandKeep
 
 # Check STAR
-fi [[ -z `which STAR 2>/dev/null` ]]; then
+fi [[ ! -e `which STAR 2>/dev/null` ]]; then
   echo "You need to install STAR to enaable local STAR execution."
   exit 1
 fi
 
 # Check readlink
-if [[ -z `which readlink 2>/dev/null` ]]; then
+if [[ ! -e `which readlink 2>/dev/null` ]]; then
   echo "You need to install readlink to enable local STAR execution."
   exit 1
 fi
