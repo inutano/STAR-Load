@@ -1,0 +1,53 @@
+#!/bin/bash
+# A script for rsem-calculate-expression to execute via cwltool with option genomeLoad=LoadandKeep
+
+# Check RSEM binary
+if [[ ! -e `which rsem-calculate-expression 2>/dev/null` ]]; then
+  echo "You need to install RSEM to enable local RSEM execution."
+  exit 1
+fi
+
+# Check readlink
+if [[ ! -e `which readlink 2>/dev/null` ]]; then
+  echo "You need to install readlink to enable local RSEM execution."
+  exit 1
+fi
+
+# For non-GNU readlink e.g. on OS X
+awesome_readlink() {
+  target="${1}"
+  while [[ "${target}" != "" ]]; do
+    cd `dirname ${target}`
+    fname=`basename ${target}`
+    target=`readlink ${fname}`
+  done
+  echo `pwd -P`/$fname
+}
+
+# Parse command line arguments
+
+# Path to index prefix is Second-to-last argument
+path_index=`echo $@ | tr ' ' '\n' | awk --assign s2l=$[$#-1] 'NR == s2l { print $0 }'`
+
+while [[ $# -gt 0 ]]; do
+  key=${1}
+  case ${key} in
+    ${path_index})
+      path_dir=`dirname ${path_index}`
+      index_prefix=`basename ${path_index}`
+
+      real_genome_dir=`awesome_readlink ${path_dir}`
+
+      ARGS="${ARGS} ${real_genome_dir}/${index_prefix}"
+      ;;
+    *)
+      ARGS="${ARGS} ${key}"
+      ;;
+  esac
+  shift
+done
+
+echo "==> RSEM-Load Arguments: ${ARGS}"
+
+# Execute STAR
+rsem-calculate-expression ${ARGS}
